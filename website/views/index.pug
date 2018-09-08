@@ -1,0 +1,50 @@
+extends layout
+
+block stylesheet
+    link(rel='stylesheet', href='stylesheets/index.css')
+
+    style.
+        body { margin-bottom: 60px; }
+        footer.footer {
+            position: absolute;
+            bottom: 0;
+            height: 60px;
+            padding-bottom: 4rem !important;
+        }
+
+block content
+    header(class='masthead text-muted text-center')
+        div(class='overlay')
+        div(class='container')
+            div(class='row')
+                div(class='col-xl-9 mx-auto')
+                    h1(class='mb-5')
+                        i(class='fas fa-coffee')
+                        | &nbsp;WikiSearch
+
+                div(class='col-md-10 col-lg-8 col-xl-7 mx-auto')
+                    form(method='get', action='/query')
+                        input(name='method', type='hidden', value='mixerpr')
+
+                        div(class='form-row')
+                            div(class='col-12 col-md-10 mb-2 mb-md-0')
+                                div(class='input-group')
+                                    input(name='keyword', type='text', class='form-control form-control-lg',
+                                          autofocus='autofocus', required='required')
+                                    div(class='input-group-append')
+                                        button(id='searchMethod', class='btn btn-outline-secondary dropdown-toggle', type='button',
+                                               data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Mixer + PageRank
+                                        div(class='dropdown-menu')
+                                            a(class='dropdown-item', href='#', onclick='setSearchMethod("Mixer + PageRank", "mixerpr");') Mixer + PageRank
+                                            a(class='dropdown-item', href='#', onclick='setSearchMethod("Mixer", "mixer");') Mixer
+                                            a(class='dropdown-item', href='#', onclick='setSearchMethod("Lucene", "lucene");') Lucene
+
+                            div(class='col-12 col-md-2')
+                                button(type='submit', class='btn btn-block btn-lg btn-primary') Go!
+
+block script
+    script.
+        function setSearchMethod(display, method) {
+            $('#searchMethod').text(display);
+            $('input[name="method"]').val(method);
+        }

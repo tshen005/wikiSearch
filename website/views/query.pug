@@ -1,0 +1,172 @@
+extends layout
+
+block stylesheet
+    style.
+        main.container {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        @media (min-width: 720px) {
+            .search-box { max-width: 10rem; }
+        }
+        @media (min-width: 995px) {
+            .search-box { min-width: 25rem; max-width: 100%; }
+        }
+        @media (min-width: 1200px) {
+            .search-box { min-width: 35rem; max-width: 100%; }
+        }
+        .mt60 { margin-top: 60px; }
+        .mb20 { margin-bottom: 20px; }
+        .stats p {
+            margin: 0;
+            padding: 1px;
+        }
+        .search-result h4 {
+            margin-bottom: 0;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        .search-result h4 span { color: #c00; }
+        .search-result .snippet b {
+            color: #c00;
+            font-weight: normal;
+        }
+        .search-result h4 a { color: #1a0dab; }
+        .search-result h4 a:visited { color: #609; }
+        .search-result .url { color: #006621; }
+        .search-result .cat { color: green; }
+        .search-result p {
+            margin: 0;
+            padding: 0;
+        }
+        nav.pager { margin-bottom: 1rem; }
+
+    if hits <= 0
+        style.
+            footer.footer {
+                position: absolute;
+                bottom: 0;
+                height: 60px;
+                padding-bottom: 4rem !important;
+            }
+
+block content
+    nav(class='navbar navbar-light bg-light static-top')
+        div(class='container')
+            a(class='navbar-brand', href='/')
+                i(class='fas fa-coffee')
+                | &nbsp;WikiSearch
+            div(class='navbar-nav mr-auto')
+                form(class='form-inline', method='get', action='/query')
+                    input(name='keyword', type='text', class='form-control mr-sm-2 search-box', required='required', value=keyword)
+
+                    div(class='btn-group btn-group-toggle mr-sm-2', data-toggle='buttons')
+                        if method === 'mixerpr'
+                            label(class='btn btn-secondary active')
+                                input(name='method', type='radio', autocomplete='off', checked='checked', value='mixerpr')
+                                | Mixer + PageRank
+                        else
+                            label(class='btn btn-secondary')
+                                input(name='method', type='radio', autocomplete='off', value='mixerpr')
+                                | Mixer + PageRank
+
+                        if method === 'mixer'
+                            label(class='btn btn-secondary active')
+                                input(name='method', type='radio', autocomplete='off', checked='checked', value='mixer')
+                                | Mixer
+                        else
+                            label(class='btn btn-secondary')
+                                input(name='method', type='radio', autocomplete='off', value='mixer')
+                                | Mixer
+
+                        if method === 'lucene'
+                            label(class='btn btn-secondary active')
+                                input(name='method', type='radio', autocomplete='off', checked='checked', value='lucene')
+                                | Lucene
+                        else
+                            label(class='btn btn-secondary')
+                                input(name='method', type='radio', autocomplete='off', value='lucene')
+                                | Lucene
+
+                    button(type='submit', class='btn btn-primary my-2 my-sm-0') Go!
+
+    main(class='container')
+        div(class='row')
+            div(class='col-md-12')
+                if hits < 0
+                    section(class='row mt60 mb20')
+                        div(class='col-md-12')
+                            p An error occurred when fetching data from backend server.
+                            p Information from backend server:
+                            ul
+                               li #{JSON.stringify(error)}
+                else if hits === 0
+                    section(class='row mt60 mb20')
+                        div(class='col-md-12')
+                            p Your search - <strong>#{keyword}</strong> - did not match any documents.
+                            p Suggestions:
+                            ul
+                                li Make sure all words are spelled correctly.
+                                li Try different keywords.
+                                li Try more general keywords.
+                                li Try fewer keywords.
+                else
+                    section(class='row mb20 stats')
+                        div(class='col-md-12')
+                            p(class='small text-muted')
+                                strong(class='text-secondary') #{hits}
+                                | &nbsp;results were found in search of&nbsp;
+                                strong(class='text-secondary') #{keyword}
+                                | &nbsp;(
+                                if hits > 1000
+                                    | Only top 1000 results are shown,&nbsp;
+                                | #{time} seconds)
+
+                    each page in pages
+                        section(class='row mb20 search-result')
+                            article(class='col-md-12')
+                                h4
+                                    a(href=page.url) !{page.title}
+                                p(class='small url') #{page.url}
+                                p(class='small text-muted') Score: #{page.score}
+                                p(class='small snippet') !{page.snippet}
+                                p(class='small text-muted') Last modified on #{page.lastModify}
+                                p(class='small')
+                                    span(class='cat font-italic') Category:&nbsp;
+                                    cite
+                                        each _, i in page.categories.html
+                                            a(class='cat', href=page.categories.href[i]) !{page.categories.html[i]}
+                                            if i < page.categories.html.length - 1
+                                                | ,&nbsp;
+
+    if hits > 0
+        nav(class='container pager')
+            div(class='row')
+                div(class='col-md-12')
+                    ul(class='pagination small justify-content-center')
+                        if pageNo > 1
+                            li(class='page-item')
+                                a(class='page-link', href=pageUrlSuffix + (pageNo - 1).toString(), aria-label='Previous')
+                                    span(aria-hidden='true') &laquo;
+                                    span(class='sr-only') Previous
+
+                        - var lower = 0, upper = 0;
+                        if pageNo % 10 === 0
+                            - upper = pageNo;
+                            - lower = upper - 9;
+                        else
+                            - lower = (pageNo / 10 | 0) * 10 + 1;
+                            - upper = Math.min(lower + 9, totalPages) | 0;
+
+                        while lower <= upper
+                            li(class=lower === pageNo ? 'page-item active' : 'page-item')
+                                if (lower === pageNo)
+                                    span(class='page-link') #{lower++}
+                                else
+                                    a(class='page-link', href=lower === pageNo ? '#' : pageUrlSuffix + lower.toString()) #{lower++}
+
+                        if pageNo < totalPages
+                            li(class='page-item')
+                                a(class='page-link', href=pageUrlSuffix + (pageNo + 1).toString(), aria-label='Next')
+                                    span(aria-hidden='true') &raquo;
+                                    span(class='sr-only') Next

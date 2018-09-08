@@ -1,0 +1,39 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+
+        title= title
+
+        link(rel='shortcut icon', href='favicon.ico')
+        link(rel='stylesheet', href='bootstrap/css/bootstrap.min.css')
+        link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.0.8/css/all.css')
+        link(rel='stylesheet', href='stylesheets/layout.css')
+
+        block stylesheet
+    body
+        block content
+
+        footer(class='footer bg-light')
+            div(class='container')
+                div(class='row')
+                    div(class='col-lg-6 h-100 text-center text-lg-left my-auto')
+                        ul(class='list-inline mb-2')
+                            li(class='list-inline-item')
+                                a(href='http://www.cs.ucr.edu/~vagelis/classes/CS242/index.htm') CS 242 ⋅ Winter 2018
+                            li(class='list-inline-item') ⋅
+                            li(class='list-inline-item') WikiSearch
+                        p(class='text-muted small mb-4 mb-lg-0') &copy;&nbsp;
+                            a(href='mailto:rwu034@ucr.edu') Renjie Wu
+                            | ,&nbsp;
+                            a(href='mailto:zshao006@ucr.edu') Zhihui Shao
+                            | &nbsp;and&nbsp;
+                            a(href='mailto:tshen021@ucr.edu') Tong Shen
+                            | &nbsp;2018. All Rights Reserved.
+
+        script(src='jquery/jquery.slim.min.js')
+        script(src='popper.js/umd/popper.min.js')
+        script(src='bootstrap/js/bootstrap.min.js')
+
+        block script
